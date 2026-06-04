@@ -36,12 +36,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .box .box-tag{font-size:22px;color:var(--txt3);margin-top:2px;min-height:28px;font-weight:600;letter-spacing:4px}
 .start-row{text-align:center;margin-bottom:4px}
 
-.start-btn:hover{box-shadow:0 6px 25px rgba(245,158,11,.3);transform:translateY(-2px)}
-
-.btn-stick:hover:not(:disabled){box-shadow:0 2px 6px rgba(245,158,11,.15)}
-
-.btn-switch:hover:not(:disabled){box-shadow:0 2px 6px rgba(16,185,129,.15)}
-
 .modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px)}
 .modal-overlay.show{display:flex}
 .modal{background:linear-gradient(135deg,var(--bg2),var(--bg));border:1px solid var(--brd);border-radius:14px;padding:18px;max-width:340px;width:90%;text-align:center;animation:fadeUp .3s ease}
@@ -54,8 +48,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
 
 /* -- UI Polish -- */
-
-.btns .btn-switch:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(139,92,246,.4)}
 
 .help-btn{background:transparent;border:1px solid var(--brd);color:var(--txt2);padding:4px 10px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
 .help-btn:hover{background:var(--bg3)}
@@ -212,7 +204,7 @@ const $=i=>document.getElementById(i);
 const msg=$('msg'),bS=$('btnStick'),bW=$('btnSwitch');
 const bA=$('boxA'),bB=$('boxB'),cA=$('coinsA'),cB=$('coinsB');
 const tA=$('tagA'),tB=$('tagB'),iA=$('infoA'),iB=$('infoB');
-const mM=$('sumModal'),dT=$('detailTable');
+const mM=$('sumModal');
 
 // Fixed box contents
 // A = [GG, GG]  (two gold coins)
@@ -232,7 +224,7 @@ cA.innerHTML='';cB.innerHTML='';
       const backCls=isPicked?(S.face==='g'?'face-gold':'face-silver'):'';
       const backText=isPicked?(S.face==='g'?'金':'银'):'';
       const rCls=(S.phase==='done')?'flip disabled':'';
-      const cls='mini-coin '+flipped+' '+disabled+rCls;
+      const cls='mini-coin '+flipped+' '+disabled+' '+rCls;
       const frontColorCls=showContent?(type==='G'?'face-gold':'face-silver'):'';
       container.innerHTML+='<div class="'+cls.trim()+'" data-box="'+bk+'" data-idx="'+i+'" data-type="'+type+'" tabindex="0" role="button" onclick="window._cc(this)"><div class="mc-inner"><div class="mc-face mc-front '+frontColorCls+'">🪙</div><div class="mc-face mc-back '+backCls+'">'+backText+'</div></div></div>';
     });
@@ -371,12 +363,6 @@ function uS(){
   $('switchDet').textContent=S.sww+'/'+S.swt;
   $('skipPct').textContent=S.total>0?Math.round(S.skip/S.total*100)+'%':'—';
   $('skipDet').textContent=S.skip+'局';
-  dT.classList.add('show');
-  $('dStick').textContent=S.stt;$('dSwitch').textContent=S.swt;$('dSkip').textContent=S.skip;
-  $('dStickW').textContent=S.stw;$('dSwitchW').textContent=S.sww;
-  $('dStickP').textContent=S.stt>0?Math.round(S.stw/S.stt*100)+'%':'—';
-  $('dSwitchP').textContent=S.swt>0?Math.round(S.sww/S.swt*100)+'%':'—';
-  $('dSkipP').textContent=S.total>0?Math.round(S.skip/S.total*100)+'%':'—';
 }
 
 function cS(){
