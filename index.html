@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>猜金币 · 经典两箱问题</title>
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{--bg:#0f1325;--bg2:#1a2140;--bg3:#28305a;--brd:#3a4670;--txt:#f0f4ff;--txt2:#a0b0d0;--txt3:#7080a0;--gold:#f59e0b;--gold2:#fbbf24;--silv:#94a3b8;--grn:#34d399;--purp:#8b5cf6}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+.container{max-width:420px;width:100%;padding:8px;display:flex;flex-direction:column;height:100dvh;height:100vh;overflow:hidden}
+.header{text-align:center;margin-bottom:8px}
+.header h1{font-size:22px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+.header
+
+.stat{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:4px 4px;text-align:center}
+.stat .lbl{font-size:10px;color:var(--txt3)}
+.stat .val{font-size:18px;font-weight:800}
+.stat .val.gold{color:var(--gold)}.stat .val.grn{color:var(--grn)}.stat .val.purp{color:var(--purp)}.stat .val.silv{color:var(--txt2)}
+.stat 
+.box-area{display:flex;gap:8px;justify-content:center;margin-bottom:6px;flex:1;min-height:0}
+.box{background:linear-gradient(145deg,#1a2148,#121838);border:1px solid rgba(245,158,11,0.12);border-radius:16px;padding:10px 6px;text-align:center;flex:1;max-width:195px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.04);display:flex;flex-direction:column;justify-content:center;min-height:0}
+
+.box .box-lbl{font-size:13px;color:var(--txt2);font-weight:700;margin-bottom:2px;letter-spacing:.5px}
+.box .box-lbl span{font-weight:400;font-size:9px;color:var(--txt3);display:block}
+.coin-row{display:flex;gap:10px;justify-content:center;margin-bottom:4px}
+.mini-coin{width:50px;height:50px;border-radius:50%;cursor:pointer;position:relative;transition:transform .25s}
+
+.mc-inner{width:100%;height:100%;position:relative;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.mini-coin.flip .mc-inner{transform:rotateY(180deg)}
+
+@keyframes flashSwap{0%{transform:translateX(0) scale(1);opacity:1}30%{transform:translateX(-6px) scale(.94);opacity:.7}70%{transform:translateX(6px) scale(.94);opacity:.7}100%{transform:translateX(0) scale(1);opacity:1}}
+.box .box-tag{font-size:22px;color:var(--txt3);margin-top:2px;min-height:28px;font-weight:600;letter-spacing:4px}
+.start-row{text-align:center;margin-bottom:4px}
+
+.start-btn:hover{box-shadow:0 6px 25px rgba(245,158,11,.3);transform:translateY(-2px)}
+
+.btn-stick:hover:not(:disabled){box-shadow:0 2px 6px rgba(245,158,11,.15)}
+
+.btn-switch:hover:not(:disabled){box-shadow:0 2px 6px rgba(16,185,129,.15)}
+
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px)}
+.modal-overlay.show{display:flex}
+.modal{background:linear-gradient(135deg,var(--bg2),var(--bg));border:1px solid var(--brd);border-radius:14px;padding:18px;max-width:340px;width:90%;text-align:center;animation:fadeUp .3s ease}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+.modal
+.modal
+.modal .close-btn{background:linear-gradient(135deg,var(--purp),#7c3aed);color:#fff;padding:6px 18px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
+@media(max-width:640px){.box-area{gap:4px}}
+@keyframes shuffleAnim{0%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-2deg)}50%{transform:translateX(8px) rotate(2deg)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
+
+/* -- UI Polish -- */
+
+.btns .btn-switch:not(:disabled):hover{transform:translateY(-2px);box-shadow:0 5px 18px rgba(139,92,246,.4)}
+
+.help-btn{background:transparent;border:1px solid var(--brd);color:var(--txt2);padding:4px 10px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
+.help-btn:hover{background:var(--bg3)}
+
+</style>
+/* -- Box artsy -- */
+.box.loser{opacity:.45;filter:grayscale(.7)}
+.box::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:2px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(99,102,241,0.1),rgba(245,158,11,0.15));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:exclude;mask-composite:exclude;pointer-events:none}
+.box.highlight::before{background:linear-gradient(135deg,rgba(245,158,11,0.5),rgba(251,191,36,0.3))}
+.box.winner::before{background:linear-gradient(135deg,rgba(52,211,153,0.5),rgba(16,185,129,0.3))}
+.box.highlight::after{content:'';position:absolute;inset:-3px;border-radius:19px;background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent);animation:chestGlow 2s ease-in-out infinite;pointer-events:none}
+.box.winner::after{content:'';position:absolute;inset:-3px;border-radius:19px;background:linear-gradient(135deg,rgba(52,211,153,0.08),transparent);animation:chestGlow 2s ease-in-out infinite;pointer-events:none}
+@keyframes chestGlow{0%,100%{opacity:.4}50%{opacity:.7}}
+.mini-coin:not(.disabled):hover{transform:scale(1.12);box-shadow:0 0 16px rgba(245,158,11,0.3)}
+.mc-front:not(.disabled):hover{border-color:var(--gold);box-shadow:0 0 14px rgba(245,158,11,0.25)}
+.mc-back.face-gold{background:linear-gradient(145deg,#fcd34d,#f59e0b,#b45309);border-color:#f59e0b;color:#1a1a2e;box-shadow:inset 0 -3px 8px rgba(0,0,0,.2),0 0 12px rgba(245,158,11,0.3)}
+.mc-back.face-silver{background:linear-gradient(145deg,#f1f5f9,#94a3b8,#64748b);border-color:#94a3b8;color:#1a1a2e;box-shadow:inset 0 -3px 8px rgba(0,0,0,.2)}
+.mc-back.reveal-gg{background:linear-gradient(135deg,#fbbf24,#d97706);border-color:var(--gold);color:#1a1a2e;box-shadow:0 0 20px rgba(245,158,11,0.4)}
+
+.mc-front{border-width:2.5px;transition:background .5s ease,border-color .5s ease,box-shadow .5s ease}
+.mini-coin{transition:transform .25s,box-shadow .3s;z-index:1}
+.box .box-lbl{position:relative;z-index:1}
+.coin-row{position:relative;z-index:1}
+.box .box-tag{position:relative;z-index:1}
+
+.toolbar-row{display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px}
+.tool-btn{background:var(--bg2);border:1px solid var(--brd);color:var(--txt2);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s}
+.tool-btn:hover{background:var(--bg3)}
+.msg{font-size:14px;color:var(--txt2);text-align:center;margin-bottom:6px;min-height:24px;transition:all .3s}
+
+.btns .action-btn{padding:8px 14px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;transition:all .2s;flex:1;max-width:130px}
+.btns .action-btn:disabled{opacity:.25;cursor:not-allowed}
+.btns .action-btn.stick{background:linear-gradient(135deg,var(--gold),#d97706)}
+.btns .action-btn.switch{background:linear-gradient(135deg,#6366f1,#4f46e5)}
+
+@media(min-height:780px){.mini-coin{width:56px;height:56px}.mc-face{font-size:22px}.box-tag{font-size:26px;min-height:34px}.box{max-width:220px;padding:14px 8px}}
+@media(max-width:360px){.container{max-width:100%;padding:4px}.mini-coin{width:42px;height:42px}.mc-face{font-size:17px}.coin-row{gap:6px}.header h1{font-size:18px}}
+
+</head>
+<body>
+<div class="container">
+<div class="header">
+  <h1>🪙 猜金币</h1>
+  <div class="sub">一个箱子装着两枚金币／另一个装一金一银<br>翻出一枚金色——坚持还是换箱？</div>
+</div>
+<div class="toolbar-row">
+  <button class="tool-btn" id="swapBtn">🔀 随机换位</button>
+  <button class="tool-btn" id="restartBtn">🔄 重开新局</button>
+  <button class="tool-btn" id="modeToggle">🔳 暗箱</button>
+  <button class="tool-btn" id="simBtn">📊 模拟统计</button>
+  <button class="tool-btn help-btn" id="helpBtn">❓</button>
+</div>
+<div class="stats">
+  <div class="stat"><div class="lbl">🏠坚持</div><div class="val gold" id="stickPct">—</div><div class="sub" id="stickDet">0/0</div></div>
+  <div class="stat"><div class="lbl">🔄换箱</div><div class="val grn" id="switchPct">—</div><div class="sub" id="switchDet">0/0</div></div>
+  <div class="stat"><div class="lbl">⚪银面</div><div class="val silv" id="skipPct">—</div><div class="sub" id="skipDet">0局</div></div>
+</div>
+<div class="box-area">
+  <div class="box" id="boxA">
+    <div class="box-lbl">📦 箱 A<span id="infoA">🔍</span></div>
+    <div class="coin-row" id="coinsA"></div>
+    <div class="box-tag" id="tagA"></div>
+  </div>
+  <div class="box" id="boxB">
+    <div class="box-lbl">📦 箱 B<span id="infoB">🔍</span></div>
+    <div class="coin-row" id="coinsB"></div>
+    <div class="box-tag" id="tagB"></div>
+  </div>
+</div>
+
+<div class="msg" id="msg">🎲 点击任意硬币翻转选择</div>
+<div class="btns">
+  <button class="action-btn stick" id="btnStick" disabled>🏠 坚持此箱</button>
+  <button class="action-btn switch" id="btnSwitch" disabled>🔄 换另一箱</button>
+</div>
+</div>
+<div class="modal-overlay" id="simModal">
+  <div class="modal" style="max-width:420px">
+    <div class="tag">📊 蒙特卡洛模拟</div>
+    <div class="body">
+      <p style="margin-bottom:10px">快速模拟大量对局，验证概率理论。</p>
+      <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
+        <label style="font-size:13px;color:var(--txt2);white-space:nowrap">模拟次数：</label>
+        <select id="simCount" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--txt);font-size:15px">
+          <option value="100">100 次</option>
+          <option value="500">500 次</option>
+          <option value="1000" selected>1,000 次</option>
+          <option value="5000">5,000 次</option>
+          <option value="10000">10,000 次</option>
+          <option value="50000">50,000 次</option>
+        </select>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button class="action-btn stick" id="simStick" style="flex:1;font-size:14px">🏠 模拟坚持</button>
+        <button class="action-btn switch" id="simSwitch" style="flex:1;font-size:14px">🔄 模拟换箱</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:10px">
+        <button class="btn" id="simBoth" style="flex:1;font-size:14px;background:var(--purp);color:#fff;padding:10px 14px">📊 两种都跑</button>
+        <button class="btn" id="simAll" style="flex:1;font-size:14px;background:var(--txt3);color:#fff;padding:10px 14px">⚪ 含银面统计</button>
+      </div>
+      <div id="simResult" style="display:none;background:var(--bg);border-radius:10px;padding:12px;margin-top:4px;font-size:14px;line-height:1.7">
+      </div>
+      <div id="simLoading" style="display:none;text-align:center;padding:20px;font-size:16px;color:var(--txt2)">⏳ 模拟中，请稍候...</div>
+    </div>
+    <button class="close-btn" id="closeSim">关闭</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="helpModal">
+  <div class="modal"><div class="tag">📖 游戏说明</div>
+    <div class="body">
+      <p><b>经典两箱硬币问题（Bertrand's Box Paradox）</b></p>
+      <p style="margin-top:8px"><b>📦 箱子设定：</b></p>
+      <p>  箱 A —— 🪙 金币 + 🪙 金币（双金箱）</p>
+      <p>  箱 B —— 🪙 金币 + 🪙 银币（一金一银箱）</p>
+      <p style="margin-top:8px"><b>🎮 游戏流程：</b></p>
+      <p>① 系统随机分配两箱，一箱双金、一箱一金一银</p>
+      <p>② 点击任意一枚硬币，将其翻转</p>
+      <p>③ 翻出金色 → 选「<b>坚持此箱</b>」或「<b>换另一箱</b>」</p>
+      <p>④ 翻出银色 → 此局作废，自动重开</p>
+      <p style="margin-top:8px"><b>🔀 工具栏功能：</b></p>
+      <p>  🔀 随机换位 —— 交换左右箱子，排除位置干扰</p>
+      <p>  🔄 重开新局 —— 重置统计，开始新一局</p>
+      <p>  🔳 暗箱/明牌 —— 切换是否显示箱内金币分布</p>
+      <p>  📊 模拟统计 —— 蒙特卡洛模拟验证概率</p>
+      <p style="margin-top:8px"><b>🤯 概率悖论：</b></p>
+      <p>P(此箱=双金箱 | 翻出金色) = <b style="color:var(--gold)">2/3 ≈ 66.7%</b></p>
+      <p>→ <b style="color:var(--grn)">坚持</b>此箱获胜概率更高！</p>
+    </div>
+    <button class="close-btn" id="closeHelp">好的</button>
+  </div>
+</div>
+<div class="modal-overlay" id="sumModal">
+  <div class="modal"><div class="tag" id="sumTag">小结</div>
+    <div class="conclusion" id="sumConc"></div>
+    <button class="close-btn" id="closeSum">继续</button>
+  </div>
+</div>
+<script>
+// ---- Audio helpers ----
+let actx=null;
+function ax(){if(!actx||actx.state==='closed')actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx}
+function son(){return true}
+function tone(f,d,t,v){if(!son())return;try{const c=ax(),o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.value=f;const n=c.currentTime;g.gain.setValueAtTime(v||.15,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g).connect(c.destination);o.start(n);o.stop(n+d)}catch(e){}}
+function sFlip(){if(!son())return;try{const c=ax(),b=c.sampleRate*.25,buf=c.createBuffer(1,b,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<b;i++){const t=i/c.sampleRate;d[i]=(Math.random()*2-1)*Math.pow(1-t/.25,2)*.2}const s=c.createBufferSource();s.buffer=buf;const g=c.createGain(),n=c.currentTime;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);s.connect(g).connect(c.destination);s.start(n)}catch(e){}}
+function sWin(){if(!son())return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12,'sine',.09),i*100))}
+function sLose(){if(!son())return;[350,262,196].forEach((f,i)=>setTimeout(()=>tone(f,.16,'sawtooth',.06-i*.01),i*80))}
+let zhV=null,vs=null;
+function iV(){if(typeof speechSynthesis==='undefined')return;const p=()=>{const v=speechSynthesis.getVoices();if(!v.length)return;zhV=v.find(x=>/zh/i.test(x.lang)&&/female|Mei|Ting|Sin|x-zh/.test(x.name))||v.find(x=>/zh/i.test(x.lang))||null};p();speechSynthesis.onvoiceschanged=p}
+function spk(t){if(!son()||typeof speechSynthesis==='undefined')return;if(vs)clearTimeout(vs);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=.85;u.pitch=1.1;if(zhV)u.voice=zhV;vs=setTimeout(()=>{vs=null},8000);u.onend=()=>{if(vs){clearTimeout(vs);vs=null}};u.onerror=()=>{if(vs){clearTimeout(vs);vs=null}};try{speechSynthesis.speak(u)}catch(e){}}
+function sst(){if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel();if(vs){clearTimeout(vs);vs=null}}
+// ---- Game State ----
+const $=i=>document.getElementById(i);
+const msg=$('msg'),bS=$('btnStick'),bW=$('btnSwitch');
+const bA=$('boxA'),bB=$('boxB'),cA=$('coinsA'),cB=$('coinsB');
+const tA=$('tagA'),tB=$('tagB'),iA=$('infoA'),iB=$('infoB');
+const mM=$('sumModal'),dT=$('detailTable');
+
+// Fixed box contents
+// A = [GG, GG]  (two gold coins)
+// B = [GS, GS]  (one gold, one silver)
+
+const S={phase:'done',boxPicked:null,coinPicked:null,face:null,transparent:false,
+  total:0,stw:0,stt:0,sww:0,swt:0,skip:0,lsr:0};
+
+function renderCoins(showContent){
+cA.innerHTML='';cB.innerHTML='';
+  ['a','b'].forEach(bk=>{
+    const box=S.boxes?S.boxes[bk]:['?','?'];const container=bk==='a'?cA:cB;
+    box.forEach((type,i)=>{
+      const isPicked=S.coinPicked!==null&&bk===S.boxPicked&&i===S.coinPicked;
+      const flipped=isPicked?'flip':'';
+      const disabled=(S.phase==='done'||S.phase==='idle'||isPicked)?'disabled':'';
+      const backCls=isPicked?(S.face==='g'?'face-gold':'face-silver'):'';
+      const backText=isPicked?(S.face==='g'?'金':'银'):'';
+      const rCls=(S.phase==='done')?'flip disabled':'';
+      const cls='mini-coin '+flipped+' '+disabled+rCls;
+      const frontColorCls=showContent?(type==='G'?'face-gold':'face-silver'):'';
+      container.innerHTML+='<div class="'+cls.trim()+'" data-box="'+bk+'" data-idx="'+i+'" data-type="'+type+'" tabindex="0" role="button" onclick="window._cc(this)"><div class="mc-inner"><div class="mc-face mc-front '+frontColorCls+'">🪙</div><div class="mc-face mc-back '+backCls+'">'+backText+'</div></div></div>';
+    });
+  });
+  if(showContent){
+    tA.innerHTML='';tB.innerHTML='';
+  }else{tA.innerHTML='❓ ❓';tB.innerHTML='❓ ❓'}
+  // No per-render binding needed; uses inline onclick in HTML template below
+}
+
+function toggleMode(){
+  S.transparent=!S.transparent;
+  $('modeToggle').innerHTML=S.transparent?'🔍 明牌':'🔳 暗箱';
+  if(S.phase==='pick'||S.phase==='decide'||S.phase==='done')renderCoins(S.transparent);
+  if(S.phase==='idle'&&S.transparent){
+    tA.innerHTML='';tB.innerHTML='';
+  }
+  updateBoxInfo();
+}
+
+function updateBoxInfo(){
+  if(!S.boxes)return;
+  const aBox=S.boxes.a,bBox=S.boxes.b;
+  const aGold=aBox.filter(x=>x==='G').length,aSilver=aBox.filter(x=>x==='S').length;
+  const bGold=bBox.filter(x=>x==='G').length,bSilver=bBox.filter(x=>x==='S').length;
+  if(S.transparent){
+    iA.innerHTML='<span style="color:var(--gold)">\u91d1\u00d7'+aGold+'</span> <span style="color:var(--txt3)">\u94f6\u00d7'+aSilver+'</span>';
+    iB.innerHTML='<span style="color:var(--gold)">\u91d1\u00d7'+bGold+'</span> <span style="color:var(--txt3)">\u94f6\u00d7'+bSilver+'</span>';
+  }else{
+    iA.innerHTML='\U0001f50d';
+    iB.innerHTML='\U0001f50d';
+  }
+}
+
+function newRound(){
+  S.phase='idle';sst();
+  bA.classList.remove('highlight','winner','loser');
+  bB.classList.remove('highlight','winner','loser');
+  tA.innerHTML='❓ ❓';tB.innerHTML='❓ ❓';
+  iA.textContent='';iB.textContent='';
+  S.boxPicked=null;S.coinPicked=null;S.face=null;
+  renderCoins(S.transparent);
+  // Auto start the game immediately
+  startGame();
+}
+
+function startGame(){
+  if(S.phase==='pick'||S.phase==='decide')return;
+
+  // Randomly swap: one box gets [G,G], other gets [G,S]
+  const swap=Math.random()<0.5;
+  // Each box content: GG box = [G,G], GS box = [G,S] with S randomly at position 0 or 1
+  const gsRandom=Math.random()<0.5?['G','S']:['S','G'];
+  const aBoxes=swap?gsRandom:['G','G'];
+  const bBoxes=swap?['G','G']:gsRandom;
+  S.boxes={a:aBoxes,b:bBoxes};
+  S.phase='pick';
+  renderCoins(S.transparent);
+  updateBoxInfo();
+  msg.innerHTML='👆 点击一枚硬币翻转 —— 翻出金色才能选择坚持或换箱';
+  spk('请选择一枚硬币翻转。');
+}
+
+function clickCoin(el){
+if(S.phase!=='pick')return;
+  S.phase='flipped';sFlip();
+  const box=el.dataset.box,idx=parseInt(el.dataset.idx);
+  S.boxPicked=box;S.coinPicked=idx;
+  const type=el.dataset.type; // 'G' or 'S'
+  // Gold coin always shows gold; silver coin shows silver
+  S.face=(type==='G')?'g':'s';
+  el.classList.add('flip');
+  const ft=S.face==='g'?'金':'银',fc=S.face==='g'?'face-gold':'face-silver';
+  el.querySelector('.mc-back').textContent=ft;
+  el.querySelector('.mc-back').className='mc-face mc-back '+fc;
+  el.classList.add('disabled');
+  document.querySelectorAll('.mini-coin').forEach(c=>c.classList.add('disabled'));
+  if(S.face==='s'){
+    sLose();S.total++;S.skip++;
+    msg.innerHTML='😢 翻出银币！此箱至少含一枚银币';
+    setTimeout(()=>{
+      document.body.style.animation='shake .3s ease';
+      setTimeout(()=>{document.body.style.animation=''},300);
+      revealAll();
+      S.phase='done';uS();cS();
+      setTimeout(()=>{if(S.phase==='done')newRound()},1500);
+    },600);
+    return;
+  }
+  (S.boxPicked==='a'?bA:bB).classList.add('highlight');
+  msg.innerHTML='✨ <b style="color:var(--gold)">金色面</b>！坚持此箱还是换另一箱？';
+  bS.disabled=false;bW.disabled=false;S.phase='decide';
+  spk('金色。坚持还是换？');
+}
+
+function revealAll(){
+  document.querySelectorAll('.mini-coin').forEach(c=>{
+    c.classList.add('flip','disabled');
+    const t=c.dataset.type;
+    c.querySelector('.mc-back').textContent=(t==='G')?'金':'银';
+    c.querySelector('.mc-back').className='mc-face mc-back '+(t==='G'?'reveal-gg':'reveal-gs');
+  });
+  // Count gold coins per box
+  const aGold=S.boxes.a.filter(x=>x==='G').length;
+  const bGold=S.boxes.b.filter(x=>x==='G').length;
+  tA.innerHTML='';tB.innerHTML='';
+  const aGG=aGold===2;const bGG=bGold===2;
+  bA.classList.remove('highlight');bB.classList.remove('highlight');
+  if(aGG&&!bGG){bA.classList.add('winner');bB.classList.add('loser')}
+  else if(bGG&&!aGG){bB.classList.add('winner');bA.classList.add('loser')}
+  else{bA.classList.add('winner');bB.classList.add('winner')}
+  updateBoxInfo();
+}
+
+function dcd(stick){
+  if(S.phase!=='decide')return;sst();
+  const pickedGold=S.boxes[S.boxPicked].filter(x=>x==='G').length;
+  const otherBox=S.boxPicked==='a'?'b':'a';
+  const otherGold=S.boxes[otherBox].filter(x=>x==='G').length;
+  // Win condition: your final box has more gold coins
+  const win=stick?(pickedGold===2):(otherGold===2);
+  S.total++;
+  if(stick){S.stt++;if(win)S.stw++}else{S.swt++;if(win)S.sww++}
+  revealAll();
+  msg.innerHTML=(win?'🎉 ':'😢 ')+(stick?'坚持此箱':'换箱')+(win?'，赢得双金币箱！':'…此箱只有一枚金币');
+  if(win)sWin();else sLose();
+  bS.disabled=true;bW.disabled=true;
+  S.phase='done';uS();cS();
+  setTimeout(()=>{if(S.phase==='done')newRound()},2000);
+}
+
+function uS(){
+  $('stickPct').textContent=S.stt>0?Math.round(S.stw/S.stt*100)+'%':'—';
+  $('switchPct').textContent=S.swt>0?Math.round(S.sww/S.swt*100)+'%':'—';
+  $('stickDet').textContent=S.stw+'/'+S.stt;
+  $('switchDet').textContent=S.sww+'/'+S.swt;
+  $('skipPct').textContent=S.total>0?Math.round(S.skip/S.total*100)+'%':'—';
+  $('skipDet').textContent=S.skip+'局';
+  dT.classList.add('show');
+  $('dStick').textContent=S.stt;$('dSwitch').textContent=S.swt;$('dSkip').textContent=S.skip;
+  $('dStickW').textContent=S.stw;$('dSwitchW').textContent=S.sww;
+  $('dStickP').textContent=S.stt>0?Math.round(S.stw/S.stt*100)+'%':'—';
+  $('dSwitchP').textContent=S.swt>0?Math.round(S.sww/S.swt*100)+'%':'—';
+  $('dSkipP').textContent=S.total>0?Math.round(S.skip/S.total*100)+'%':'—';
+}
+
+function cS(){
+  if(S.total>0&&S.total%20===0&&S.total!==S.lsr){S.lsr=S.total;sShow()}
+}
+
+function sShow(){
+  const sp=S.stt>0?Math.round(S.stw/S.stt*100):0;
+  const sw=S.swt>0?Math.round(S.sww/S.swt*100):0;
+  $('sumTag').textContent='第'+S.total+'局';
+  let t='🏠坚持 <b style="color:var(--gold)">'+sp+'%</b> ('+S.stw+'/'+S.stt+')<br>🔄换箱 <b style="color:var(--grn)">'+sw+'%</b> ('+S.sww+'/'+S.swt+')<br>⚪银面 '+S.skip+'/'+S.total+'局<br>';
+  t+='<br>📖 理论：P(此箱=GG|金) = <b style="color:var(--gold)">2/3 ≈ 66.7%</b>';
+  t+='<br>  <b style="color:var(--gold)">坚持</b>趋近 66.7% · <b style="color:var(--grn)">换箱</b>趋近 33.3%';
+  $('sumConc').innerHTML=t;
+  mM.classList.add('show');
+}
+
+// -- Swap boxes --
+function swapBoxes(){
+  if(!S.boxes||S.phase==='flipped')return;
+  const n=1+Math.floor(Math.random()*5)*2;
+  for(let i=0;i<n;i++){
+    const tmp=S.boxes.a;
+    S.boxes.a=S.boxes.b;
+    S.boxes.b=tmp;
+    if(S.boxPicked==='a')S.boxPicked='b';
+    else if(S.boxPicked==='b')S.boxPicked='a';
+  }
+  renderCoins(S.transparent);
+  sShuffle();
+  updateBoxInfo();
+  bA.style.transition='border-color .3s,box-shadow .3s';
+  bB.style.transition='border-color .3s,box-shadow .3s';
+  bA.style.borderColor='var(--txt3)';bA.style.boxShadow='0 0 16px rgba(148,163,184,.2)';
+  bB.style.borderColor='var(--txt3)';bB.style.boxShadow='0 0 16px rgba(148,163,184,.2)';
+  setTimeout(()=>{bA.style.borderColor='';bA.style.boxShadow='';bB.style.borderColor='';bB.style.boxShadow=''},400);
+  bA.classList.remove('highlight');bB.classList.remove('highlight');
+  if(S.boxPicked==='a')bA.classList.add('highlight');
+  else if(S.boxPicked==='b')bB.classList.add('highlight');
+  msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！'+(S.boxPicked?('  选中箱'+(S.boxPicked==='a'?'A':'B')):'')+(S.phase==='pick'?'  选一枚硬币':S.phase==='decide'?'  重新决定':'.');
+}
+
+// -- Simulation engine --
+function runSimulation(n, strategy){
+  // strategy: 'stick', 'switch', 'both', or 'all' (includes skip rounds)
+  const result={stick:{w:0,t:0},switch:{w:0,t:0},skip:0};
+  for(let i=0;i<n;i++){
+    const swap=Math.random()<0.5;
+    const boxes=swap?{a:['G','S'],b:['G','G']}:{a:['G','G'],b:['G','S']};
+    const picked=Math.random()<0.5?'a':'b';
+    const other=picked==='a'?'b':'a';
+    const pickedBox=boxes[picked];
+    const isGG=pickedBox[0]==='G'&&pickedBox[1]==='G';
+    let face;
+    if(isGG){
+      face='g';
+    }else{
+      const coinIdx=Math.random()<0.5?0:1;
+      face=pickedBox[coinIdx]==='G'?'g':'s';
+    }
+    if(strategy==='all'){
+      // Count ALL rounds (including silver face rounds)
+      if(face==='s'){result.skip++;continue}
+      const pickedGold=pickedBox.filter(x=>x==='G').length;
+      const otherGold=boxes[other].filter(x=>x==='G').length;
+      result.stick.t++;result.switch.t++;
+      if(pickedGold>=otherGold)result.stick.w++;
+      if(otherGold>pickedGold)result.switch.w++;
+    }else{
+      if(face==='s'){result.skip++;continue}
+      const pickedGold=pickedBox.filter(x=>x==='G').length;
+      const otherGold=boxes[other].filter(x=>x==='G').length;
+      result.stick.t++;result.switch.t++;
+      if(pickedGold>=otherGold)result.stick.w++;
+      if(otherGold>pickedGold)result.switch.w++;
+    }
+  }
+  return result;
+}
+
+function showSimResult(label, r){
+  const sP=r.stick.t>0?Math.round(r.stick.w/r.stick.t*100):0;
+  const swP=r.switch.t>0?Math.round(r.switch.w/r.switch.t*100):0;
+  const total=r.stick.t+r.skip;
+  const skipP=r.skip>0?Math.round(r.skip/total*100):0;
+  return '<div style="margin-top:4px"><b>'+label+'</b></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px">'+
+    '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">🏠坚持</div><div style="font-size:18px;font-weight:700;color:var(--gold)">'+sP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.stick.w+'/'+r.stick.t+'</div></div>'+
+    '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">🔄换箱</div><div style="font-size:18px;font-weight:700;color:var(--grn)">'+swP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.switch.w+'/'+r.switch.t+'</div></div>'+
+    '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">⚪银面(无效)</div><div style="font-size:18px;font-weight:700;color:var(--txt2)">'+skipP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.skip+'/'+total+'</div></div>'+
+    '</div>';
+}
+
+function runSim(strategy){
+  const n=parseInt($('simCount').value);
+  const simR=$('simResult'),simL=$('simLoading');
+  simL.style.display='block';simR.style.display='none';
+  setTimeout(()=>{
+    const r=runSimulation(n,strategy);
+    simL.style.display='none';simR.style.display='block';
+    if(strategy==='both'){
+      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 · 坚持vs换箱',r)+
+        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
+        '📖 理论：坚持 <b style="color:var(--gold)">66.7%</b> · 换箱 <b style="color:var(--grn)">33.3%</b> · 银面 <b style="color:var(--txt2)">25%</b></div>';
+    }else if(strategy==='all'){
+      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 · 含银面统计',r)+
+        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
+        '📖 理论：坚持 <b style="color:var(--gold)">66.7%</b> · 换箱 <b style="color:var(--grn)">33.3%</b> · 银面 <b style="color:var(--txt2)">25%</b>（占总局数）</div>';
+    }else{
+      const label=(strategy==='stick'?'🏠 仅模拟坚持（翻到金面即选择坚持）':'🔄 仅模拟换箱（翻到金面即选择换箱）');
+      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 - '+label,r)+
+        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
+        '📖 理论：<b style="color:var(--gold)">'+(strategy==='stick'?'坚持 66.7%':'换箱 33.3%')+'</b></div>';
+    }
+    spk('模拟完成。');
+  },50);
+}
+
+// -- Event listeners --
+$('btnStick').addEventListener('click',()=>dcd(true));
+$('btnSwitch').addEventListener('click',()=>dcd(false));
+$('swapBtn').addEventListener('click',swapBoxes);
+$('restartBtn').addEventListener('click',()=>{sst();S.total=0;S.stw=0;S.stt=0;S.sww=0;S.swt=0;S.skip=0;S.lsr=0;bS.disabled=true;bW.disabled=true;uS();newRound();});
+$('modeToggle').addEventListener('click',toggleMode);
+$('helpBtn').addEventListener('click',()=>{$('helpModal').style.display='flex'});
+$('closeHelp').addEventListener('click',()=>{$('helpModal').style.display='none'});
+$('helpModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none'});
+$('simBtn').addEventListener('click',()=>{$('simModal').style.display='flex'});
+$('closeSim').addEventListener('click',()=>{$('simModal').style.display='none'});
+$('simModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none'});
+$('simStick').addEventListener('click',()=>runSim('stick'));
+$('simSwitch').addEventListener('click',()=>runSim('switch'));
+$('simBoth').addEventListener('click',()=>runSim('both'));
+$('simAll').addEventListener('click',()=>runSim('all'));
+$('closeSum').addEventListener('click',()=>{mM.classList.remove('show');if(S.phase==='done')spk('继续。')});
+mM.addEventListener('click',e=>{if(e.target===e.currentTarget)mM.classList.remove('show')});
+
+// -- Global inline click handler --
+window._cc=function(el){
+  if(S.phase!=='pick')return;
+  if(el.classList.contains('disabled'))return;
+  clickCoin(el);
+};
+
+// -- Init --
+iV();newRound();
+</script>
+</body>
+</html>
