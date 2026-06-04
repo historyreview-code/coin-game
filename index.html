@@ -163,7 +163,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="stat"><div class="lbl">🔄换箱</div><div class="val grn" id="switchPct">—</div><div class="sub" id="switchDet">0/0</div></div>
   <div class="stat"><div class="lbl">⚪银面</div><div class="val silv" id="skipPct">—</div><div class="sub" id="skipDet">0局</div></div>
 </div>
-<div class="rule-hint" id="ruleHint">💡 点击任意硬币翻转 → 翻出金色后可选择坚持或换箱 <span class="rule-link" id="helpBtn2">📖 规则详情</span> · <span class="rule-link" id="restartBtn2">🔄 重开</span></div>
+<div class="rule-hint" id="ruleHint">💡 点击任意硬币翻转 → 翻出金色后可选择坚持或换箱 <span class="rule-link" id="helpBtn2">📖 规则详情</span> · <span class="rule-link" id="restartBtn2" style="font-size:15px;font-weight:700;color:var(--gold);padding:2px 8px;border-radius:6px;">🔄 重开新局</span></div>
 <button class="sim-bottom-btn" id="simBtn">📊 模拟统计 · 验证概率</button>
 </div>
 <div class="modal-overlay" id="simModal">
@@ -419,30 +419,25 @@ function sShow(){
 function swapBoxes(){
   if(!S.boxes||S.phase==='flipped')return;
   const n=1+Math.floor(Math.random()*5)*2;
-  const boxArea=document.querySelector('.box-area');
-  // Swap data
+  // Swap data in a loop for random odd number of times
   for(let i=0;i<n;i++){
     const tmp=S.boxes.a;S.boxes.a=S.boxes.b;S.boxes.b=tmp;
     if(S.boxPicked==='a')S.boxPicked='b';
     else if(S.boxPicked==='b')S.boxPicked='a';
   }
   // Animate: blue box (left) slides right, green box (right) slides left
-  boxArea.classList.add('swapping');
+  bA.style.transition='transform .5s cubic-bezier(.4,0,.2,1)';
+  bB.style.transition='transform .5s cubic-bezier(.4,0,.2,1)';
   bA.style.transform='translateX(calc(100% + 8px))';
   bB.style.transform='translateX(calc(-100% - 8px))';
   setTimeout(()=>{
-    // Reorder DOM: move boxB (green, now on left) before boxA (blue, now on right)
-    boxArea.insertBefore(bB, bA);
-    // Re-assign globals since DOM order changed
-    bA=$('boxA');bB=$('boxB');
-    cA=$('coinsA');cB=$('coinsB');
-    tA=$('tagA');tB=$('tagB');
-    iA=$('infoA');iB=$('infoB');
-    // Reset transforms
+    // Data is already swapped — just re-render from data
+    // Boxes snap back to their flex positions with new coin content
+    bA.style.transition='none';bB.style.transition='none';
     bA.style.transform='';bB.style.transform='';
+    // Force reflow
+    void bA.offsetHeight;
     bA.style.transition='';bB.style.transition='';
-    boxArea.classList.remove('swapping');
-    // Update visuals
     renderCoins(S.transparent);
     updateBoxInfo();
     bA.classList.remove('highlight');bB.classList.remove('highlight');
