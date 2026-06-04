@@ -10,49 +10,69 @@
 <style>
 *,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
 :root{--bg:#0f1325;--bg2:#1a2140;--bg3:#28305a;--brd:#3a4670;--txt:#f0f4ff;--txt2:#a0b0d0;--txt3:#7080a0;--gold:#f59e0b;--gold2:#fbbf24;--silv:#94a3b8;--grn:#34d399;--purp:#8b5cf6}
-body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:var(--bg);color:var(--txt);min-height:100dvh;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#0f1325;color:#f0f4ff;min-height:100dvh;min-height:100vh;display:flex;justify-content:center;align-items:center;overflow:hidden;touch-action:manipulation;-webkit-tap-highlight-color:transparent}
 .container{max-width:420px;width:100%;padding:8px;display:flex;flex-direction:column;height:100dvh;height:100vh;overflow:hidden}
 .header{text-align:center;margin-bottom:8px}
-.header h1{font-size:22px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
-.header
-
+.header h1{font-size:28px;background:linear-gradient(135deg,var(--gold),var(--gold2));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1.2}
+.header .sub{font-size:14px;color:var(--txt2);line-height:1.5}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:6px}
 .stat{background:var(--bg2);border:1px solid var(--brd);border-radius:8px;padding:4px 4px;text-align:center}
 .stat .lbl{font-size:10px;color:var(--txt3)}
-.stat .val{font-size:18px;font-weight:800}
+.stat .val{font-size:22px;font-weight:800}
 .stat .val.gold{color:var(--gold)}.stat .val.grn{color:var(--grn)}.stat .val.purp{color:var(--purp)}.stat .val.silv{color:var(--txt2)}
-.stat 
+.stat .sub{font-size:10px;color:var(--txt3)}
 .box-area{display:flex;gap:8px;justify-content:center;margin-bottom:6px;flex:1;min-height:0}
-.box{background:linear-gradient(145deg,#1a2148,#121838);border:1px solid rgba(245,158,11,0.12);border-radius:16px;padding:10px 6px;text-align:center;flex:1;max-width:195px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.04);display:flex;flex-direction:column;justify-content:center;min-height:0}
-
-.box .box-lbl{font-size:13px;color:var(--txt2);font-weight:700;margin-bottom:2px;letter-spacing:.5px}
-.box .box-lbl span{font-weight:400;font-size:9px;color:var(--txt3);display:block}
+.box{background:linear-gradient(145deg,#1a2148,#121838);border:2px solid rgba(245,158,11,0.25);border-radius:16px;padding:10px 6px;text-align:center;flex:1;max-width:195px;min-height:120px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.04);display:flex;flex-direction:column;justify-content:center;min-height:0}
+.box.loser{opacity:.45;filter:grayscale(.7)}
+.box.highlight{border-color:var(--gold)}.box.winner{border-color:var(--grn)}
+.box .box-lbl{font-size:16px;color:var(--txt2);font-weight:700;margin-bottom:4px;letter-spacing:.5px}
+.box .box-lbl span{font-weight:400;font-size:9px;color:var(--txt3);display:block;margin-top:1px}
 .coin-row{display:flex;gap:10px;justify-content:center;margin-bottom:4px}
-.mini-coin{width:50px;height:50px;border-radius:50%;cursor:pointer;position:relative;transition:transform .25s}
-
-.mc-inner{width:100%;height:100%;position:relative;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.mini-coin{width:50px;height:50px;border-radius:50%;cursor:pointer;position:relative;transition:transform .25s,box-shadow .3s}
+.mini-coin:not(.disabled):hover{transform:scale(1.12);box-shadow:0 0 16px rgba(245,158,11,0.3)}
+.mini-coin.disabled{cursor:default;opacity:.6}
 .mini-coin.flip .mc-inner{transform:rotateY(180deg)}
-
-@keyframes flashSwap{0%{transform:translateX(0) scale(1);opacity:1}30%{transform:translateX(-6px) scale(.94);opacity:.7}70%{transform:translateX(6px) scale(.94);opacity:.7}100%{transform:translateX(0) scale(1);opacity:1}}
+.mc-inner{width:100%;height:100%;position:relative;transition:transform .7s cubic-bezier(.4,0,.2,1);transform-style:preserve-3d}
+.mc-face{position:absolute;width:100%;height:100%;border-radius:50%;backface-visibility:hidden;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:700;border:2.5px solid #4a5a80}
+.mc-front{background:radial-gradient(circle at 40% 35%,#2a3560,#141a2e);z-index:2;font-size:20px;border-color:#5a6a90;border-width:2.5px;transition:background .5s ease,border-color .5s ease,box-shadow .5s ease}
+.mc-front:not(.disabled):hover{border-color:var(--gold);box-shadow:0 0 14px rgba(245,158,11,0.25)}
+.mc-back{transform:rotateY(180deg);font-size:18px;font-weight:800}
+.mc-back.face-gold,.mc-front.face-gold{background:linear-gradient(145deg,#fcd34d,#f59e0b,#b45309);border-color:#f59e0b;color:#1a1a2e;box-shadow:inset 0 -3px 8px rgba(0,0,0,.2),0 0 12px rgba(245,158,11,0.3)}
+.mc-back.face-silver,.mc-front.face-silver{background:linear-gradient(145deg,#f1f5f9,#94a3b8,#64748b);border-color:#94a3b8;color:#1a1a2e;box-shadow:inset 0 -3px 8px rgba(0,0,0,.2)}
+.mc-back.reveal-gg{background:linear-gradient(135deg,#fbbf24,#d97706);border-color:var(--gold);color:#1a1a2e;box-shadow:0 0 20px rgba(245,158,11,0.4)}
+.mc-back.reveal-gs{background:linear-gradient(135deg,#e2e8f0,#94a3b8);border-color:var(--gold);color:#1a1a2e}
 .box .box-tag{font-size:22px;color:var(--txt3);margin-top:2px;min-height:28px;font-weight:600;letter-spacing:4px}
+.box::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:2px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(99,102,241,0.1),rgba(245,158,11,0.15));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:exclude;mask-composite:exclude;pointer-events:none}
+.box.highlight::before{background:linear-gradient(135deg,rgba(245,158,11,0.5),rgba(251,191,36,0.3))}
+.box.winner::before{background:linear-gradient(135deg,rgba(52,211,153,0.5),rgba(16,185,129,0.3))}
+.box.highlight::after{content:'';position:absolute;inset:-3px;border-radius:19px;background:linear-gradient(135deg,rgba(245,158,11,0.08),transparent);animation:chestGlow 2s ease-in-out infinite;pointer-events:none}
+.box.winner::after{content:'';position:absolute;inset:-3px;border-radius:19px;background:linear-gradient(135deg,rgba(52,211,153,0.08),transparent);animation:chestGlow 2s ease-in-out infinite;pointer-events:none}
+@keyframes chestGlow{0%,100%{opacity:.4}50%{opacity:.7}}
+@keyframes flashSwap{0%{transform:translateX(0) scale(1);opacity:1}30%{transform:translateX(-6px) scale(.94);opacity:.7}70%{transform:translateX(6px) scale(.94);opacity:.7}100%{transform:translateX(0) scale(1);opacity:1}}
 .start-row{text-align:center;margin-bottom:4px}
-
-.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);justify-content:center;align-items:center;z-index:100;backdrop-filter:blur(4px)}
+.msg{font-size:16px;color:var(--txt2);text-align:center;margin-bottom:6px;min-height:30px;transition:all .3s;padding:6px 8px;border-radius:8px}
+.btns{display:flex;gap:6px;justify-content:center;margin-bottom:4px}
+.btns .action-btn{padding:12px 16px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;transition:all .2s;flex:1;max-width:150px}
+.btns .action-btn:disabled{opacity:.25;cursor:not-allowed}
+.btns .action-btn.stick{background:linear-gradient(135deg,var(--gold),#d97706)}
+.btns .action-btn.switch{background:linear-gradient(135deg,#6366f1,#4f46e5)}
+.toolbar-row{display:flex;gap:6px;justify-content:center;margin-bottom:6px;flex-wrap:wrap}
+.tool-btn{background:var(--bg2);border:1.5px solid var(--brd);color:var(--txt2);padding:6px 10px;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px}
+.tool-btn:hover{background:var(--bg3);border-color:var(--txt3);transform:translateY(-1px)}
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.75);justify-content:center;align-items:center;z-index:100}
 .modal-overlay.show{display:flex}
-.modal{background:linear-gradient(135deg,var(--bg2),var(--bg));border:1px solid var(--brd);border-radius:14px;padding:18px;max-width:340px;width:90%;text-align:center;animation:fadeUp .3s ease}
-@keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
-.modal
-.modal
-.modal .close-btn{background:linear-gradient(135deg,var(--purp),#7c3aed);color:#fff;padding:6px 18px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
-@media(max-width:640px){.box-area{gap:4px}}
-@keyframes shuffleAnim{0%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-2deg)}50%{transform:translateX(8px) rotate(2deg)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
-@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
-
-/* -- UI Polish -- */
-
+.modal{background:linear-gradient(135deg,var(--bg2),var(--bg));border:1px solid var(--brd);border-radius:14px;padding:18px 16px;max-width:380px;width:90vw;position:relative;box-shadow:0 8px 40px rgba(0,0,0,.5)}
+.tag{display:inline-block;background:var(--purp);color:#fff;font-size:9px;padding:2px 8px;border-radius:20px;margin-bottom:8px}
+.close-btn{background:linear-gradient(135deg,var(--purp),#7c3aed);color:#fff;padding:6px 18px;border:none;border-radius:6px;font-size:11px;font-weight:600;cursor:pointer}
 .help-btn{background:transparent;border:1px solid var(--brd);color:var(--txt2);padding:4px 10px;border-radius:8px;font-size:13px;cursor:pointer;transition:all .2s}
 .help-btn:hover{background:var(--bg3)}
+@keyframes fadeUp{from{opacity:0;transform:translateY(10px) scale(.95)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes shuffleAnim{0%{transform:translateX(0)}25%{transform:translateX(-8px) rotate(-2deg)}50%{transform:translateX(8px) rotate(2deg)}75%{transform:translateX(-4px)}100%{transform:translateX(0)}}
+@keyframes shake{0%,100%{transform:translateX(0)}10%,30%,50%,70%,90%{transform:translateX(-5px)}20%,40%,60%,80%{transform:translateX(5px)}}
+@media(max-width:640px){.box-area{gap:4px}}
+@media(max-width:360px){.container{max-width:100%;padding:4px}.mini-coin{width:42px;height:42px}.mc-face{font-size:17px}.coin-row{gap:6px}}
+@media(min-height:780px){.mini-coin{width:56px;height:56px}.mc-face{font-size:22px}.box-tag{font-size:26px;min-height:34px}.box{max-width:220px;padding:14px 8px}}
 
-</style>
 /* -- Box artsy -- */
 .box.loser{opacity:.45;filter:grayscale(.7)}
 .box::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:2px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(99,102,241,0.1),rgba(245,158,11,0.15));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:exclude;mask-composite:exclude;pointer-events:none}
@@ -73,20 +93,32 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .coin-row{position:relative;z-index:1}
 .box .box-tag{position:relative;z-index:1}
 
-.toolbar-row{display:flex;gap:4px;justify-content:flex-end;margin-bottom:4px}
-.tool-btn{background:var(--bg2);border:1px solid var(--brd);color:var(--txt2);padding:2px 8px;border-radius:6px;font-size:11px;cursor:pointer;transition:all .2s}
-.tool-btn:hover{background:var(--bg3)}
+.toolbar-row{display:flex;gap:6px;justify-content:center;margin-bottom:6px;flex-wrap:wrap}
+.tool-btn{background:var(--bg2);border:1.5px solid var(--brd);color:var(--txt2);padding:6px 10px;border-radius:10px;font-size:13px;cursor:pointer;transition:all .2s;display:flex;flex-direction:column;align-items:center;gap:2px;min-width:56px}
+.tool-btn:hover{background:var(--bg3);border-color:var(--txt3);transform:translateY(-1px)}
 .msg{font-size:14px;color:var(--txt2);text-align:center;margin-bottom:6px;min-height:24px;transition:all .3s}
 
-.btns .action-btn{padding:8px 14px;border:none;border-radius:8px;font-size:13px;font-weight:700;cursor:pointer;color:#fff;transition:all .2s;flex:1;max-width:130px}
+.btns .action-btn{padding:12px 16px;border:none;border-radius:10px;font-size:16px;font-weight:700;cursor:pointer;color:#fff;transition:all .2s;flex:1;max-width:150px}
 .btns .action-btn:disabled{opacity:.25;cursor:not-allowed}
 .btns .action-btn.stick{background:linear-gradient(135deg,var(--gold),#d97706)}
 .btns .action-btn.switch{background:linear-gradient(135deg,#6366f1,#4f46e5)}
 
 @media(min-height:780px){.mini-coin{width:56px;height:56px}.mc-face{font-size:22px}.box-tag{font-size:26px;min-height:34px}.box{max-width:220px;padding:14px 8px}}
-@media(max-width:360px){.container{max-width:100%;padding:4px}.mini-coin{width:42px;height:42px}.mc-face{font-size:17px}.coin-row{gap:6px}.header h1{font-size:18px}}
+@media(max-width:360px){.container{max-width:100%;padding:4px}.mini-coin{width:42px;height:42px}.mc-face{font-size:17px}.coin-row{gap:6px} h1{font-size:18px}}
 
-</head>
+.sim-bottom-btn{display:block;width:100%;padding:14px;margin-top:8px;border:none;border-radius:12px;font-size:17px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--purp),#7c3aed);color:#fff;box-shadow:0 4px 16px rgba(139,92,246,.3);transition:all .2s;text-align:center}
+.sim-bottom-btn:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(139,92,246,.4)}
+.sim-run-btn{display:block;width:100%;padding:14px;border:none;border-radius:12px;font-size:18px;font-weight:700;cursor:pointer;background:linear-gradient(135deg,var(--gold),#d97706);color:#1a1a2e;box-shadow:0 4px 16px rgba(245,158,11,.3);transition:all .2s;text-align:center}
+.sim-run-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(245,158,11,.4)}
+
+.rule-hint{font-size:13px;color:var(--txt3);text-align:center;margin:6px 0 4px;line-height:1.6}
+.rule-link{color:var(--purp);cursor:pointer;text-decoration:underline;text-underline-offset:2px}
+.rule-link:hover{color:#a78bfa}
+
+.tb-icon{font-size:20px;line-height:1}
+.tb-lbl{font-size:11px;line-height:1;color:var(--txt3)}
+
+</style></head>
 <body>
 <div class="container">
 <div class="header">
@@ -97,8 +129,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <button class="tool-btn" id="swapBtn">🔀 随机换位</button>
   <button class="tool-btn" id="restartBtn">🔄 重开新局</button>
   <button class="tool-btn" id="modeToggle">🔳 暗箱</button>
-  <button class="tool-btn" id="simBtn">📊 模拟统计</button>
-  <button class="tool-btn help-btn" id="helpBtn">❓</button>
+  <button class="tool-btn" id="helpBtn">📖 规则</button>
 </div>
 <div class="stats">
   <div class="stat"><div class="lbl">🏠坚持</div><div class="val gold" id="stickPct">—</div><div class="sub" id="stickDet">0/0</div></div>
@@ -107,12 +138,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 </div>
 <div class="box-area">
   <div class="box" id="boxA">
-    <div class="box-lbl">📦 箱 A<span id="infoA">🔍</span></div>
+    <div class="box-lbl">📦 箱 A <span id="infoA">🔍</span></div>
     <div class="coin-row" id="coinsA"></div>
     <div class="box-tag" id="tagA"></div>
   </div>
   <div class="box" id="boxB">
-    <div class="box-lbl">📦 箱 B<span id="infoB">🔍</span></div>
+    <div class="box-lbl">📦 箱 B <span id="infoB">🔍</span></div>
     <div class="coin-row" id="coinsB"></div>
     <div class="box-tag" id="tagB"></div>
   </div>
@@ -122,12 +153,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <button class="action-btn stick" id="btnStick" disabled>🏠 坚持此箱</button>
   <button class="action-btn switch" id="btnSwitch" disabled>🔄 换另一箱</button>
 </div>
+<div class="rule-hint" id="ruleHint">💡 点击任意硬币翻转 → 翻出金色后可选择坚持或换箱 <span class="rule-link" id="helpBtn2">📖 规则详情</span></div>
+<button class="sim-bottom-btn" id="simBtn">📊 模拟统计 · 验证概率</button>
 </div>
 <div class="modal-overlay" id="simModal">
   <div class="modal" style="max-width:420px">
     <div class="tag">📊 蒙特卡洛模拟</div>
     <div class="body">
-      <p style="margin-bottom:10px">快速模拟大量对局，验证概率理论。</p>
+      <p style="margin-bottom:10px">设置模拟次数，一键快速验证概率。</p>
       <div style="display:flex;gap:10px;align-items:center;margin-bottom:12px">
         <label style="font-size:13px;color:var(--txt2);white-space:nowrap">模拟次数：</label>
         <select id="simCount" style="flex:1;padding:8px 10px;border-radius:8px;border:1px solid var(--brd);background:var(--bg2);color:var(--txt);font-size:15px">
@@ -139,14 +172,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
           <option value="50000">50,000 次</option>
         </select>
       </div>
-      <div style="display:flex;gap:8px;margin-bottom:12px">
-        <button class="action-btn stick" id="simStick" style="flex:1;font-size:14px">🏠 模拟坚持</button>
-        <button class="action-btn switch" id="simSwitch" style="flex:1;font-size:14px">🔄 模拟换箱</button>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:10px">
-        <button class="btn" id="simBoth" style="flex:1;font-size:14px;background:var(--purp);color:#fff;padding:10px 14px">📊 两种都跑</button>
-        <button class="btn" id="simAll" style="flex:1;font-size:14px;background:var(--txt3);color:#fff;padding:10px 14px">⚪ 含银面统计</button>
-      </div>
+      <button class="sim-run-btn" id="simRun">🚀 开始模拟</button>
       <div id="simResult" style="display:none;background:var(--bg);border-radius:10px;padding:12px;margin-top:4px;font-size:14px;line-height:1.7">
       </div>
       <div id="simLoading" style="display:none;text-align:center;padding:20px;font-size:16px;color:var(--txt2)">⏳ 模拟中，请稍候...</div>
@@ -188,7 +214,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <script>
 // ---- Audio helpers ----
 let actx=null;
-function ax(){if(!actx||actx.state==='closed')actx=new(window.AudioContext||window.webkitAudioContext)();if(actx.state==='suspended')actx.resume();return actx}
+function ax(){if(!actx||actxe==='closed')actx=new(window.AudioContext||window.webkitAudioContext)();if(actxe==='suspended')actx.resume();return actx}
 function son(){return true}
 function tone(f,d,t,v){if(!son())return;try{const c=ax(),o=c.createOscillator(),g=c.createGain();o.type=t||'sine';o.frequency.value=f;const n=c.currentTime;g.gain.setValueAtTime(v||.15,n);g.gain.exponentialRampToValueAtTime(.001,n+d);o.connect(g).connect(c.destination);o.start(n);o.stop(n+d)}catch(e){}}
 function sFlip(){if(!son())return;try{const c=ax(),b=c.sampleRate*.25,buf=c.createBuffer(1,b,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<b;i++){const t=i/c.sampleRate;d[i]=(Math.random()*2-1)*Math.pow(1-t/.25,2)*.2}const s=c.createBufferSource();s.buffer=buf;const g=c.createGain(),n=c.currentTime;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);s.connect(g).connect(c.destination);s.start(n)}catch(e){}}
@@ -210,7 +236,7 @@ const mM=$('sumModal');
 // B = [GS, GS]  (one gold, one silver)
 
 const S={phase:'done',boxPicked:null,coinPicked:null,face:null,transparent:false,
-  total:0,stw:0,stt:0,sww:0,swt:0,skip:0,lsr:0};
+  total:0,stw:0,stt:0,sww:0,swt:0,skip:0,lsr:0,swapped:false,ggBox:'a'};
 
 function renderCoins(showContent){
 cA.innerHTML='';cB.innerHTML='';
@@ -249,15 +275,18 @@ function updateBoxInfo(){
   const aBox=S.boxes.a,bBox=S.boxes.b;
   const aGold=aBox.filter(x=>x==='G').length,aSilver=aBox.filter(x=>x==='S').length;
   const bGold=bBox.filter(x=>x==='G').length,bSilver=bBox.filter(x=>x==='S').length;
+  const sA=S.swapped?'⇄ ':'○ ';
+  const sB=S.swapped?'⇄ ':'○ ';
+  $('boxA').querySelector('.box-lbl').innerHTML='📦 A '+sA+'<span id="infoA">';
+  $('boxB').querySelector('.box-lbl').innerHTML='📦 B '+sB+'<span id="infoB">';
   if(S.transparent){
-    iA.innerHTML='<span style="color:var(--gold)">\u91d1\u00d7'+aGold+'</span> <span style="color:var(--txt3)">\u94f6\u00d7'+aSilver+'</span>';
-    iB.innerHTML='<span style="color:var(--gold)">\u91d1\u00d7'+bGold+'</span> <span style="color:var(--txt3)">\u94f6\u00d7'+bSilver+'</span>';
+    iA.innerHTML='<span style="color:var(--gold)">金×'+aGold+'</span> <span style="color:var(--txt3)">银×'+aSilver+'</span>';
+    iB.innerHTML='<span style="color:var(--gold)">金×'+bGold+'</span> <span style="color:var(--txt3)">银×'+bSilver+'</span>';
   }else{
-    iA.innerHTML='\U0001f50d';
-    iB.innerHTML='\U0001f50d';
+    iA.innerHTML='🔍';
+    iB.innerHTML='🔍';
   }
 }
-
 function newRound(){
   S.phase='idle';sst();
   bA.classList.remove('highlight','winner','loser');
@@ -280,6 +309,8 @@ function startGame(){
   const aBoxes=swap?gsRandom:['G','G'];
   const bBoxes=swap?['G','G']:gsRandom;
   S.boxes={a:aBoxes,b:bBoxes};
+  S.ggBox=swap?'b':'a';
+  S.swapped=false;
   S.phase='pick';
   renderCoins(S.transparent);
   updateBoxInfo();
@@ -401,7 +432,7 @@ function swapBoxes(){
   bA.classList.remove('highlight');bB.classList.remove('highlight');
   if(S.boxPicked==='a')bA.classList.add('highlight');
   else if(S.boxPicked==='b')bB.classList.add('highlight');
-  msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！'+(S.boxPicked?('  选中箱'+(S.boxPicked==='a'?'A':'B')):'')+(S.phase==='pick'?'  选一枚硬币':S.phase==='decide'?'  重新决定':'.');
+  S.swapped=!S.swapped;updateBoxInfo();msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！'+(S.boxPicked?('  选中箱'+(S.boxPicked==='a'?'A':'B')):'')+(S.phase==='pick'?'  选一枚硬币':S.phase==='decide'?'  重新决定':'.');
 }
 
 // -- Simulation engine --
@@ -442,40 +473,29 @@ function runSimulation(n, strategy){
   return result;
 }
 
-function showSimResult(label, r){
+function showSimResult(n, r){
   const sP=r.stick.t>0?Math.round(r.stick.w/r.stick.t*100):0;
   const swP=r.switch.t>0?Math.round(r.switch.w/r.switch.t*100):0;
   const total=r.stick.t+r.skip;
   const skipP=r.skip>0?Math.round(r.skip/total*100):0;
-  return '<div style="margin-top:4px"><b>'+label+'</b></div>'+
-    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-top:6px">'+
+  return '<div style="margin-bottom:6px"><b>📊 '+n.toLocaleString()+' 局模拟结果</b></div>'+
+    '<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px">'+
     '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">🏠坚持</div><div style="font-size:18px;font-weight:700;color:var(--gold)">'+sP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.stick.w+'/'+r.stick.t+'</div></div>'+
     '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">🔄换箱</div><div style="font-size:18px;font-weight:700;color:var(--grn)">'+swP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.switch.w+'/'+r.switch.t+'</div></div>'+
     '<div style="background:var(--bg2);border-radius:8px;padding:6px;text-align:center"><div style="font-size:10px;color:var(--txt3)">⚪银面(无效)</div><div style="font-size:18px;font-weight:700;color:var(--txt2)">'+skipP+'%</div><div style="font-size:10px;color:var(--txt3)">'+r.skip+'/'+total+'</div></div>'+
     '</div>';
 }
 
-function runSim(strategy){
+function runSim(){
   const n=parseInt($('simCount').value);
   const simR=$('simResult'),simL=$('simLoading');
   simL.style.display='block';simR.style.display='none';
   setTimeout(()=>{
-    const r=runSimulation(n,strategy);
+    const r=runSimulation(n,'both');
     simL.style.display='none';simR.style.display='block';
-    if(strategy==='both'){
-      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 · 坚持vs换箱',r)+
-        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
-        '📖 理论：坚持 <b style="color:var(--gold)">66.7%</b> · 换箱 <b style="color:var(--grn)">33.3%</b> · 银面 <b style="color:var(--txt2)">25%</b></div>';
-    }else if(strategy==='all'){
-      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 · 含银面统计',r)+
-        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
-        '📖 理论：坚持 <b style="color:var(--gold)">66.7%</b> · 换箱 <b style="color:var(--grn)">33.3%</b> · 银面 <b style="color:var(--txt2)">25%</b>（占总局数）</div>';
-    }else{
-      const label=(strategy==='stick'?'🏠 仅模拟坚持（翻到金面即选择坚持）':'🔄 仅模拟换箱（翻到金面即选择换箱）');
-      simR.innerHTML=showSimResult('📊 '+n.toLocaleString()+'局 - '+label,r)+
-        '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:13px;color:var(--txt2)">'+
-        '📖 理论：<b style="color:var(--gold)">'+(strategy==='stick'?'坚持 66.7%':'换箱 33.3%')+'</b></div>';
-    }
+    simR.innerHTML=showSimResult(n,r)+
+      '<div style="margin-top:8px;padding:8px;background:var(--bg);border-radius:8px;text-align:center;font-size:12px;color:var(--txt2)">'+
+      '📖 理论：坚持 <b style="color:var(--gold)">66.7%</b> · 换箱 <b style="color:var(--grn)">33.3%</b> · 银面占总局数 <b style="color:var(--txt2)">25%</b></div>';
     spk('模拟完成。');
   },50);
 }
@@ -487,15 +507,13 @@ $('swapBtn').addEventListener('click',swapBoxes);
 $('restartBtn').addEventListener('click',()=>{sst();S.total=0;S.stw=0;S.stt=0;S.sww=0;S.swt=0;S.skip=0;S.lsr=0;bS.disabled=true;bW.disabled=true;uS();newRound();});
 $('modeToggle').addEventListener('click',toggleMode);
 $('helpBtn').addEventListener('click',()=>{$('helpModal').style.display='flex'});
+$('helpBtn2').addEventListener('click',()=>{$('helpModal').style.display='flex'});
 $('closeHelp').addEventListener('click',()=>{$('helpModal').style.display='none'});
 $('helpModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none'});
 $('simBtn').addEventListener('click',()=>{$('simModal').style.display='flex'});
 $('closeSim').addEventListener('click',()=>{$('simModal').style.display='none'});
 $('simModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none'});
-$('simStick').addEventListener('click',()=>runSim('stick'));
-$('simSwitch').addEventListener('click',()=>runSim('switch'));
-$('simBoth').addEventListener('click',()=>runSim('both'));
-$('simAll').addEventListener('click',()=>runSim('all'));
+$('simRun').addEventListener('click',()=>runSim('both'));
 $('closeSum').addEventListener('click',()=>{mM.classList.remove('show');if(S.phase==='done')spk('继续。')});
 mM.addEventListener('click',e=>{if(e.target===e.currentTarget)mM.classList.remove('show')});
 
