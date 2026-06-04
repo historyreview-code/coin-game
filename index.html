@@ -163,7 +163,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="stat"><div class="lbl">🔄换箱</div><div class="val grn" id="switchPct">—</div><div class="sub" id="switchDet">0/0</div></div>
   <div class="stat"><div class="lbl">⚪银面</div><div class="val silv" id="skipPct">—</div><div class="sub" id="skipDet">0局</div></div>
 </div>
-<div class="rule-hint" id="ruleHint">💡 点击任意硬币翻转 → 翻出金色后可选择坚持或换箱 <span class="rule-link" id="helpBtn2">📖 规则详情</span> · <span class="rule-link" id="restartBtn2" style="font-size:15px;font-weight:700;color:var(--gold);padding:2px 8px;border-radius:6px;">🔄 重开新局</span></div>
+<div class="rule-hint" id="ruleHint">💡 翻出金色后选择坚持或换箱 · <span class="rule-link" id="restartBtn2" style="font-size:15px;font-weight:700;color:var(--gold);padding:2px 8px;border-radius:6px;">🔄 重开新局</span></div>
 <button class="sim-bottom-btn" id="simBtn">📊 模拟统计 · 验证概率</button>
 </div>
 <div class="modal-overlay" id="simModal">
@@ -518,7 +518,6 @@ $('btnSwitch').addEventListener('click',()=>dcd(false));
 $('swapBtn').addEventListener('click',swapBoxes);
 $('modeToggle').addEventListener('click',toggleMode);
 $('helpBtn').addEventListener('click',()=>{$('helpModal').style.display='flex'});
-$('helpBtn2').addEventListener('click',()=>{$('helpModal').style.display='flex'});
 $('restartBtn2').addEventListener('click',()=>{sst();S.total=0;S.stw=0;S.stt=0;S.sww=0;S.swt=0;S.skip=0;S.lsr=0;bS.disabled=true;bW.disabled=true;uS();newRound();});
 $('closeHelp').addEventListener('click',()=>{$('helpModal').style.display='none'});
 $('helpModal').addEventListener('click',e=>{if(e.target===e.currentTarget)e.currentTarget.style.display='none'});
