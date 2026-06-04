@@ -25,6 +25,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .box{background:linear-gradient(145deg,#1a2148,#121838);border:2px solid rgba(245,158,11,0.25);border-radius:16px;padding:10px 6px;text-align:center;flex:1;max-width:195px;min-height:120px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.04);display:flex;flex-direction:column;justify-content:center;min-height:0}
 .box.loser{opacity:.45;filter:grayscale(.7)}
 .box.highlight{border-color:var(--gold)}.box.winner{border-color:var(--grn)}
+.box .box-lbl{font-size:11px;color:var(--txt3);margin-bottom:3px;min-height:16px}
 
 .coin-row{display:flex;gap:10px;justify-content:center;margin-bottom:4px}
 .mini-coin{width:50px;height:50px;border-radius:50%;cursor:pointer;position:relative;transition:transform .25s,box-shadow .3s}
@@ -142,12 +143,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <div class="box-area">
   <div class="box" id="boxA">
-    
+    <div class="box-lbl"><span id="infoA"></span></div>
     <div class="coin-row" id="coinsA"></div>
     <div class="box-tag" id="tagA"></div>
   </div>
   <div class="box" id="boxB">
-    
+    <div class="box-lbl"><span id="infoB"></span></div>
     <div class="coin-row" id="coinsB"></div>
     <div class="box-tag" id="tagB"></div>
   </div>
@@ -430,17 +431,23 @@ function swapBoxes(){
   bA.style.transform='translateX(calc(100% + 8px))';
   bB.style.transform='translateX(calc(-100% - 8px))';
   setTimeout(()=>{
-    // Reset transforms — snap back to flex positions
+    // Reorder DOM: move boxB (green, now on left) before boxA (blue, now on right)
+    boxArea.insertBefore(bB, bA);
+    // Re-assign globals since DOM order changed
+    bA=$('boxA');bB=$('boxB');
+    cA=$('coinsA');cB=$('coinsB');
+    tA=$('tagA');tB=$('tagB');
+    iA=$('infoA');iB=$('infoB');
+    // Reset transforms
     bA.style.transform='';bB.style.transform='';
     bA.style.transition='';bB.style.transition='';
     boxArea.classList.remove('swapping');
-    // Re-render from data for consistency
+    // Update visuals
     renderCoins(S.transparent);
     updateBoxInfo();
     bA.classList.remove('highlight');bB.classList.remove('highlight');
     if(S.boxPicked==='a')bA.classList.add('highlight');
     else if(S.boxPicked==='b')bB.classList.add('highlight');
-    sShuffle();
   },500);
   S.swapped=!S.swapped;msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！';
 }
