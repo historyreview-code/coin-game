@@ -140,6 +140,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <button class="tool-btn" id="modeToggle"><span class="tb-icon">🃏</span><span class="tb-lbl">明牌游戏</span></button>
   <button class="tool-btn" id="helpBtn"><span class="tb-icon">📖</span><span class="tb-lbl">游戏规则</span></button>
 </div>
+<div class="bottom-stats">
+  <div class="stat"><div class="lbl">🏠坚持</div><div class="val gold" id="stickPct">—</div><div class="sub" id="stickDet">0/0</div></div>
+  <div class="stat"><div class="lbl">🔄换箱</div><div class="val grn" id="switchPct">—</div><div class="sub" id="switchDet">0/0</div></div>
+  <div class="stat"><div class="lbl">⚪银面</div><div class="val silv" id="skipPct">—</div><div class="sub" id="skipDet">0局</div></div>
+</div>
 
 <div class="box-area">
   <div class="box" id="boxA">
@@ -157,11 +162,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 <div class="btns">
   <button class="action-btn stick" id="btnStick" disabled>🏠 坚持此箱</button>
   <button class="action-btn switch" id="btnSwitch" disabled>🔄 换另一箱</button>
-</div>
-<div class="bottom-stats">
-  <div class="stat"><div class="lbl">🏠坚持</div><div class="val gold" id="stickPct">—</div><div class="sub" id="stickDet">0/0</div></div>
-  <div class="stat"><div class="lbl">🔄换箱</div><div class="val grn" id="switchPct">—</div><div class="sub" id="switchDet">0/0</div></div>
-  <div class="stat"><div class="lbl">⚪银面</div><div class="val silv" id="skipPct">—</div><div class="sub" id="skipDet">0局</div></div>
 </div>
 <div class="rule-hint" id="ruleHint">💡 翻出金色后选择坚持或换箱 · <span class="rule-link" id="restartBtn2" style="font-size:15px;font-weight:700;color:var(--gold);padding:2px 8px;border-radius:6px;">🔄 重开新局</span></div>
 <button class="sim-bottom-btn" id="simBtn">📊 模拟统计 · 验证概率</button>
