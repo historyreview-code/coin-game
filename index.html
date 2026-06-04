@@ -25,8 +25,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .box{background:linear-gradient(145deg,#1a2148,#121838);border:2px solid rgba(245,158,11,0.25);border-radius:16px;padding:10px 6px;text-align:center;flex:1;max-width:195px;min-height:120px;transition:all .4s;position:relative;box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(255,255,255,0.04);display:flex;flex-direction:column;justify-content:center;min-height:0}
 .box.loser{opacity:.45;filter:grayscale(.7)}
 .box.highlight{border-color:var(--gold)}.box.winner{border-color:var(--grn)}
-.box .box-lbl{font-size:16px;color:var(--txt2);font-weight:700;margin-bottom:4px;letter-spacing:.5px}
-.box .box-lbl span{font-weight:400;font-size:9px;color:var(--txt3);display:block;margin-top:1px}
+
 .coin-row{display:flex;gap:10px;justify-content:center;margin-bottom:4px}
 .mini-coin{width:50px;height:50px;border-radius:50%;cursor:pointer;position:relative;transition:transform .25s,box-shadow .3s}
 .mini-coin:not(.disabled):hover{transform:scale(1.12);box-shadow:0 0 16px rgba(245,158,11,0.3)}
@@ -73,6 +72,10 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 @media(max-width:360px){.container{max-width:100%;padding:4px}.mini-coin{width:42px;height:42px}.mc-face{font-size:17px}.coin-row{gap:6px}}
 @media(min-height:780px){.mini-coin{width:56px;height:56px}.mc-face{font-size:22px}.box-tag{font-size:26px;min-height:34px}.box{max-width:220px;padding:14px 8px}}
 
+/* -- Swap animation -- */
+.box-area.swapping .box{transition:transform .5s cubic-bezier(.4,0,.2,1) !important}
+.box-area .box{transition:transform .5s cubic-bezier(.4,0,.2,1),all .4s}
+
 /* -- Box artsy -- */
 .box.loser{opacity:.45;filter:grayscale(.7)}
 .box::before{content:'';position:absolute;inset:-1px;border-radius:17px;padding:2px;background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(99,102,241,0.1),rgba(245,158,11,0.15));-webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);-webkit-mask-composite:exclude;mask-composite:exclude;pointer-events:none}
@@ -89,7 +92,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 .mc-front{border-width:2.5px;transition:background .5s ease,border-color .5s ease,box-shadow .5s ease}
 .mini-coin{transition:transform .25s,box-shadow .3s;z-index:1}
-.box .box-lbl{position:relative;z-index:1}
+
 .coin-row{position:relative;z-index:1}
 .box .box-tag{position:relative;z-index:1}
 
@@ -118,11 +121,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 .tb-icon{font-size:20px;line-height:1}
 .tb-lbl{font-size:11px;line-height:1;color:var(--txt3)}
 
-.box.blue-box{background:linear-gradient(145deg,#1a2a4a,#0f1d3d);border-color:rgba(59,130,246,0.3);box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(96,165,250,0.08)}
-.box.green-box{background:linear-gradient(145deg,#1a3a2a,#0f2d1d);border-color:rgba(52,211,153,0.3);box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(52,211,153,0.08)}
-.box.blue-box .box-lbl{color:#93c5fd}
-.box.green-box .box-lbl{color:#6ee7b7}
-.box.transitioning{transition:all .5s cubic-bezier(.4,0,.2,1)}
+.box.blue-box{background:linear-gradient(145deg,#1a2d5e,#0f1a38);border-color:rgba(59,130,246,0.5);box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(59,130,246,0.12)}
+.box.green-box{background:linear-gradient(145deg,#1a3d28,#0f2418);border-color:rgba(52,211,153,0.4);box-shadow:0 4px 20px rgba(0,0,0,.4),inset 0 1px 0 rgba(52,211,153,0.1)}
+
 
 .bottom-stats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:4px;margin-bottom:4px}
 
@@ -141,12 +142,12 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
 
 <div class="box-area">
   <div class="box" id="boxA">
-    <div class="box-lbl">📦 箱 A <span id="infoA">🔍</span></div>
+    
     <div class="coin-row" id="coinsA"></div>
     <div class="box-tag" id="tagA"></div>
   </div>
   <div class="box" id="boxB">
-    <div class="box-lbl">📦 箱 B <span id="infoB">🔍</span></div>
+    
     <div class="coin-row" id="coinsB"></div>
     <div class="box-tag" id="tagB"></div>
   </div>
@@ -193,9 +194,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;b
   <div class="modal"><div class="tag">📖 游戏说明</div>
     <div class="body">
       <p><b>经典两箱硬币问题（Bertrand's Box Paradox）</b></p>
-      <p style="margin-top:8px"><b>📦 箱子设定：</b></p>
-      <p>  箱 A —— 🪙 金币 + 🪙 金币（双金箱）</p>
-      <p>  箱 B —— 🪙 金币 + 🪙 银币（一金一银箱）</p>
       <p style="margin-top:8px"><b>🎮 游戏流程：</b></p>
       <p>① 系统随机分配两箱，一箱双金、一箱一金一银</p>
       <p>② 点击任意一枚硬币，将其翻转</p>
@@ -281,14 +279,11 @@ function toggleMode(){
 function updateBoxInfo(){
   if(!S.boxes)return;
   const aBox=S.boxes.a,bBox=S.boxes.b;
-  const aGold=aBox.filter(x=>x==='G').length,aSilver=aBox.filter(x=>x==='S').length;
-  const bGold=bBox.filter(x=>x==='G').length,bSilver=bBox.filter(x=>x==='S').length;
-  const aCls=S.swapped?'green-box':'blue-box';
-  const bCls=S.swapped?'blue-box':'green-box';
-  bA.className='box '+aCls;bB.className='box '+bCls;
-  $('boxA').querySelector('.box-lbl').innerHTML='📦 A <span id="infoA">';
-  $('boxB').querySelector('.box-lbl').innerHTML='📦 B <span id="infoB">';
+  // boxA is always blue (left), boxB is always green (right)
+  bA.className='box blue-box';bB.className='box green-box';
   if(S.transparent){
+    const aGold=aBox.filter(x=>x==='G').length,aSilver=aBox.filter(x=>x==='S').length;
+    const bGold=bBox.filter(x=>x==='G').length,bSilver=bBox.filter(x=>x==='S').length;
     iA.innerHTML='<span style="color:var(--gold)">金×'+aGold+'</span> <span style="color:var(--txt3)">银×'+aSilver+'</span>';
     iB.innerHTML='<span style="color:var(--gold)">金×'+bGold+'</span> <span style="color:var(--txt3)">银×'+bSilver+'</span>';
   }else{
@@ -423,25 +418,31 @@ function sShow(){
 function swapBoxes(){
   if(!S.boxes||S.phase==='flipped')return;
   const n=1+Math.floor(Math.random()*5)*2;
+  const boxArea=document.querySelector('.box-area');
+  // Swap data
   for(let i=0;i<n;i++){
-    const tmp=S.boxes.a;
-    S.boxes.a=S.boxes.b;
-    S.boxes.b=tmp;
+    const tmp=S.boxes.a;S.boxes.a=S.boxes.b;S.boxes.b=tmp;
     if(S.boxPicked==='a')S.boxPicked='b';
     else if(S.boxPicked==='b')S.boxPicked='a';
   }
-  renderCoins(S.transparent);
-  sShuffle();
-  updateBoxInfo();
-  bA.style.transition='border-color .3s,box-shadow .3s';
-  bB.style.transition='border-color .3s,box-shadow .3s';
-  bA.style.borderColor='var(--txt3)';bA.style.boxShadow='0 0 16px rgba(148,163,184,.2)';
-  bB.style.borderColor='var(--txt3)';bB.style.boxShadow='0 0 16px rgba(148,163,184,.2)';
-  setTimeout(()=>{bA.style.borderColor='';bA.style.boxShadow='';bB.style.borderColor='';bB.style.boxShadow=''},400);
-  bA.classList.remove('highlight');bB.classList.remove('highlight');
-  if(S.boxPicked==='a')bA.classList.add('highlight');
-  else if(S.boxPicked==='b')bB.classList.add('highlight');
-  S.swapped=!S.swapped;updateBoxInfo();msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！'+(S.boxPicked?('  选中箱'+(S.boxPicked==='a'?'A':'B')):'')+(S.phase==='pick'?'  选一枚硬币':S.phase==='decide'?'  重新决定':'.');
+  // Animate: blue box (left) slides right, green box (right) slides left
+  boxArea.classList.add('swapping');
+  bA.style.transform='translateX(calc(100% + 8px))';
+  bB.style.transform='translateX(calc(-100% - 8px))';
+  setTimeout(()=>{
+    // Reset transforms — snap back to flex positions
+    bA.style.transform='';bB.style.transform='';
+    bA.style.transition='';bB.style.transition='';
+    boxArea.classList.remove('swapping');
+    // Re-render from data for consistency
+    renderCoins(S.transparent);
+    updateBoxInfo();
+    bA.classList.remove('highlight');bB.classList.remove('highlight');
+    if(S.boxPicked==='a')bA.classList.add('highlight');
+    else if(S.boxPicked==='b')bB.classList.add('highlight');
+    sShuffle();
+  },500);
+  S.swapped=!S.swapped;msg.innerHTML='🔀 随机换位 '+n+' 次，两箱已互换！';
 }
 
 // -- Simulation engine --
