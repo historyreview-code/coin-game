@@ -228,8 +228,8 @@ function sFlip(){if(!son())return;try{const c=ax(),b=c.sampleRate*.25,buf=c.crea
 function sWin(){if(!son())return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12,'sine',.09),i*100))}
 function sLose(){if(!son())return;[350,262,196].forEach((f,i)=>setTimeout(()=>tone(f,.16,'sawtooth',.06-i*.01),i*80))}
 let zhV=null,vs=null;
-function iV(){if(typeof speechSynthesis==='undefined')return;const p=()=>{const v=speechSynthesis.getVoices();if(!v.length)return;zhV=v.find(x=>/zh/i.test(x.lang)&&/female|Mei|Ting|Sin|x-zh/.test(x.name))||v.find(x=>/zh/i.test(x.lang))||null};p();speechSynthesis.onvoiceschanged=p}
-function spk(t){if(!son()||typeof speechSynthesis==='undefined')return;if(vs)clearTimeout(vs);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=.85;u.pitch=1.1;if(zhV)u.voice=zhV;vs=setTimeout(()=>{vs=null},8000);u.onend=()=>{if(vs){clearTimeout(vs);vs=null}};u.onerror=()=>{if(vs){clearTimeout(vs);vs=null}};try{speechSynthesis.speak(u)}catch(e){}}
+function iV(){if(typeof speechSynthesis==='undefined')return;const p=()=>{const v=speechSynthesis.getVoices();if(!v.length)return;zhV=v.find(x=>/tingting/i.test(x.name))||v.find(x=>/sinji/i.test(x.name))||v.find(x=>/shelley/i.test(x.name)&&/female/.test(x.name))||v.find(x=>/zh/i.test(x.lang)&&/female/i.test(x.name))||v.find(x=>/zh/i.test(x.lang))||null};p();speechSynthesis.onvoiceschanged=p}
+function spk(t){if(!son()||typeof speechSynthesis==='undefined')return;if(vs)clearTimeout(vs);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=.78;u.pitch=1.05;u.volume=.9;if(zhV)u.voice=zhV;vs=setTimeout(()=>{vs=null},8000);u.onend=()=>{if(vs){clearTimeout(vs);vs=null}};u.onerror=()=>{if(vs){clearTimeout(vs);vs=null}};try{speechSynthesis.speak(u)}catch(e){}}
 function sst(){if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel();if(vs){clearTimeout(vs);vs=null}}
 // ---- Game State ----
 const $=i=>document.getElementById(i);
