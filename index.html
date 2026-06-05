@@ -227,10 +227,32 @@ function tone(f,d,t,v){if(!son())return;try{const c=ax(),o=c.createOscillator(),
 function sFlip(){if(!son())return;try{const c=ax(),b=c.sampleRate*.25,buf=c.createBuffer(1,b,c.sampleRate),d=buf.getChannelData(0);for(let i=0;i<b;i++){const t=i/c.sampleRate;d[i]=(Math.random()*2-1)*Math.pow(1-t/.25,2)*.2}const s=c.createBufferSource();s.buffer=buf;const g=c.createGain(),n=c.currentTime;g.gain.setValueAtTime(.25,n);g.gain.exponentialRampToValueAtTime(.001,n+.25);s.connect(g).connect(c.destination);s.start(n)}catch(e){}}
 function sWin(){if(!son())return;[523,659,784,1047].forEach((f,i)=>setTimeout(()=>tone(f,.12,'sine',.09),i*100))}
 function sLose(){if(!son())return;[350,262,196].forEach((f,i)=>setTimeout(()=>tone(f,.16,'sawtooth',.06-i*.01),i*80))}
-let zhV=null,vs=null;
+let zhV=null,vs=null,ttsOk=false;
+// Edge TTS: try local server first, fallback to Web Speech API
+async function tts(txt){
+  if(!son())return;
+  try{
+    const r=await fetch('http://localhost:3090/tts',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({text:txt,voice:'zh-CN-XiaoxiaoNeural'})});
+    if(!r.ok)throw new Error('HTTP '+r.status);
+    const b=await r.arrayBuffer();
+    const ac=ax(),au=ac.decodeAudioData(b);
+    const s=ac.createBufferSource();s.buffer=await au;
+    const g=ac.createGain();g.gain.value=.7;
+    s.connect(g).connect(ac.destination);s.start(0);
+    ttsOk=true;
+    return;
+  }catch(e){if(!ttsOk)console.log('Edge TTS unavailable, using Web Speech');}
+  // Fallback: Web Speech API
+  if(typeof speechSynthesis==='undefined')return;
+  speechSynthesis.cancel();
+  const u=new SpeechSynthesisUtterance(txt);
+  u.lang='zh-CN';u.rate=.78;u.pitch=1.05;u.volume=.9;
+  if(zhV)u.voice=zhV;
+  try{speechSynthesis.speak(u)}catch(e){}
+}
 function iV(){if(typeof speechSynthesis==='undefined')return;const p=()=>{const v=speechSynthesis.getVoices();if(!v.length)return;zhV=v.find(x=>/tingting/i.test(x.name))||v.find(x=>/sinji/i.test(x.name))||v.find(x=>/shelley/i.test(x.name)&&/female/.test(x.name))||v.find(x=>/zh/i.test(x.lang)&&/female/i.test(x.name))||v.find(x=>/zh/i.test(x.lang))||null};p();speechSynthesis.onvoiceschanged=p}
-function spk(t){if(!son()||typeof speechSynthesis==='undefined')return;if(vs)clearTimeout(vs);speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(t);u.lang='zh-CN';u.rate=.78;u.pitch=1.05;u.volume=.9;if(zhV)u.voice=zhV;vs=setTimeout(()=>{vs=null},8000);u.onend=()=>{if(vs){clearTimeout(vs);vs=null}};u.onerror=()=>{if(vs){clearTimeout(vs);vs=null}};try{speechSynthesis.speak(u)}catch(e){}}
-function sst(){if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel();if(vs){clearTimeout(vs);vs=null}}
+function spk(t){tts(t)}
+function sst(){if(typeof speechSynthesis!=='undefined')speechSynthesis.cancel()}
 // ---- Game State ----
 const $=i=>document.getElementById(i);
 const msg=$('msg'),bS=$('btnStick'),bW=$('btnSwitch');
